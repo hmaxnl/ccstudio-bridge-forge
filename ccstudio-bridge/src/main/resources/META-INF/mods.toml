@@ -1,0 +1,90 @@
+# This is an example mods.toml file. It contains the data relating to the loading mods.
+# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
+# The overall format is standard TOML format, v0.5.0.
+# Note that there are a couple of TOML lists in this file.
+# Find more information on toml format here:  https://github.com/toml-lang/toml
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml" #mandatory
+# A version range to match for the mod loading platform.
+loaderVersion="${loader_version_range}" #mandatory
+# The license for this mod. The full list of values can be found at: https://docs.gradle.org/current/userguide/license.html
+# Some common examples:
+#   The MIT License (MIT)       - https://www.opensource.org/licenses/MIT
+#   The Apache License, Version 2.0   - https://www.apache.org/licenses/LICENSE-2.0
+#   The GNU Lesser General Public License v2.1 or later (LGPL)   - https://www.gnu.org/licenses/old-licenses/lgpl-2.1-standalone.html
+#   The GNU General Public License v2 with the "Classpath Exception" - https://github.com/IntelliAPI/ForgeClasspath
+#   All Rights Reserved         - https://www.gnu.org/licenses/gpl-3.0.en.html
+license="${mod_license}"
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://example.com/issues" #optional
+# A list of mods - how many allowed here is determined by the individual mod loader
+[[mods]] #mandatory
+# The modid of the mod
+modId="${mod_id}" #mandatory
+# The version number of the mod
+version="${mod_version}" #mandatory
+# A display name for the mod
+displayName="${mod_name}" #mandatory
+# A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
+#updateJSONURL="https://change.me.example/update.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.example/homepage" #optional
+# A file name (in the root of the mod JAR) containing a logo for displaying
+#logoFile="ccstudio.png" #optional
+# A text field displayed in the mod UI
+credits="Editor UI by kivts (CIDE-CC, MIT license). See CIDE-CREDIT-LICENSE-MIT.txt." #optional
+# A text field displayed in the mod UI
+authors="${mod_authors}" #optional
+# Display Test controls the display for your mod in the server connection screen
+# MATCH_VERSION means that your mod will be displayed in the select screen if the server version of the mod matches
+# IGNORE_SERVER_VERSION means that your mod will be displayed in the select screen regardless of the server versions
+# NO_DISPLAY means that your mod will not be displayed in the server connection screen.
+# Specify MATCH_VERSION, if you have 'depends' declared for the mod
+displayTest="MATCH_VERSION" #match_this_version | ignore_server_version
+
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.${mod_id}]] #optional
+    # the modid of the dependency
+    modId="forge" #mandatory
+    # Whether the dependency is required
+    mandatory=true #mandatory
+    # The version range of the dependency
+    versionRange="${forge_version_range}" #mandatory
+    # An ordering and dependency field, can be used to specify whether the mod is a required or optional dependency
+    ordering="NONE" #mandatory
+    # Side the dependency is applicable on. BOTH, CLIENT, or SERVER
+    side="BOTH" #mandatory
+# Here's an example so you can copy-paste it for your own mod.
+# [[dependencies.${mod_id}]]
+#     modId="examplemod"
+#     type="required"
+#     versionRange="[1.0.0,2.0.0)"
+#     ordering="NONE"
+#     side="BOTH"
+
+# Features are named capabilities offered by a mod.
+#[[features.${mod_id}]] #optional
+# The name of the feature
+# name="feature"
+# The version range of the feature
+# versionRange="[1.0.0,2.0.0)"
+# The type of the feature. Can be one of "required", "optional", "incompatible" or "discouraged" (case insensitive).
+# type="required"
+# An ordering and dependency field, can be used to specify whether the mod is a required or optional dependency
+# ordering="NONE"
+# Side the dependency is applicable on. BOTH, CLIENT, or SERVER
+# side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="computercraft"
+    mandatory=true
+    versionRange="[1.116.0,)"
+    ordering="AFTER"
+    side="BOTH"

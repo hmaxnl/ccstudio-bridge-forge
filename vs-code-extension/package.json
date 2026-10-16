@@ -1,0 +1,393 @@
+{
+  "name": "cclink",
+  "displayName": "ccLink",
+  "version": "0.1.0",
+  "preview": true,
+  "description": "Allows connecting to and controlling ComputerCraft computers from VS Code",
+  "publisher": "carsakiller",
+  "license": "MIT",
+  "author": {
+    "name": "carsakiller",
+    "email": "carsakiller@gmail.com",
+    "url": "https://gitlab.com/carsakiller"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/computercraft-link/vs-code-extension.git"
+  },
+  "homepage": "https://gitlab.com/computercraft-link/vs-code-extension",
+  "main": "./dist/extension.js",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:lua",
+    "onFileSystem:ccLink"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "title": "Add Computer",
+        "command": "ccLink.addComputer",
+        "icon": "$(plus)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Remove Computer",
+        "command": "ccLink.removeComputer",
+        "icon": "$(trash)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Disconnect Computer",
+        "command": "ccLink.disconnectComputer",
+        "icon": "$(debug-disconnect)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Copy UUID",
+        "command": "ccLink.copyUUID",
+        "icon": "$(clipboard)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Reboot",
+        "command": "ccLink.reboot",
+        "icon": "$(refresh)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Refresh File List",
+        "command": "ccLink.refreshFileList",
+        "icon": "$(sync)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Open Remote Shell",
+        "command": "ccLink.createComputerShell",
+        "icon": "$(terminal)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Add Glob Pattern",
+        "command": "ccLink.addGlobPattern",
+        "icon": "$(add)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Remove Glob Pattern",
+        "command": "ccLink.removeGlobPattern",
+        "icon": "$(search-stop)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Resume Watching",
+        "command": "ccLink.resumeWatching",
+        "icon": "$(play)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Pause Watching",
+        "command": "ccLink.pauseWatching",
+        "icon": "$(debug-pause)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Create File",
+        "command": "ccLink.createFile",
+        "category": "ccLink"
+      },
+      {
+        "title": "Create Folder",
+        "command": "ccLink.createFolder",
+        "category": "ccLink"
+      },
+      {
+        "title": "Delete File",
+        "command": "ccLink.deleteFile",
+        "category": "ccLink"
+      },
+      {
+        "title": "Download File",
+        "command": "ccLink.downloadFile",
+        "icon": "$(desktop-download)",
+        "category": "ccLink"
+      },
+      {
+        "title": "Rename File",
+        "command": "ccLink.renameFile",
+        "category": "ccLink"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ccLinkViewContainer",
+          "title": "ComputerCraft Link",
+          "icon": "$(vm-connect)"
+        }
+      ]
+    },
+    "views": {
+      "ccLinkViewContainer": [
+        {
+          "id": "ccLinkComputers",
+          "name": "Computers"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "ccLinkComputers",
+        "contents": "No computers found\n[Add Computer](command:ccLink.addComputer)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "ccLink.downloadFile",
+          "group": "navigation",
+          "when": "resourceScheme == ccLink"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "ccLink.addComputer",
+          "group": "navigation",
+          "when": "view == ccLinkComputers"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "ccLink.removeComputer",
+          "group": "inline",
+          "when": "view == ccLinkComputers && viewItem == computer"
+        },
+        {
+          "command": "ccLink.disconnectComputer",
+          "group": "inline@10",
+          "when": "view == ccLinkComputers && viewItem == connected_computer"
+        },
+        {
+          "command": "ccLink.copyUUID",
+          "group": "2_info",
+          "when": "view == ccLinkComputers && (viewItem == computer || viewItem == connected_computer)"
+        },
+        {
+          "command": "ccLink.reboot",
+          "group": "1_power",
+          "when": "view == ccLinkComputers && viewItem == connected_computer"
+        },
+        {
+          "command": "ccLink.refreshFileList",
+          "group": "inline@2",
+          "when": "view == ccLinkComputers && viewItem == connected_computer"
+        },
+        {
+          "command": "ccLink.createComputerShell",
+          "group": "inline@1",
+          "when": "view == ccLinkComputers && viewItem == connected_computer"
+        },
+        {
+          "command": "ccLink.refreshFileList",
+          "group": "inline",
+          "when": "view == ccLinkComputers && (viewItem == remote_file_tree || viewItem == connected_remote_file_tree)"
+        },
+        {
+          "command": "ccLink.addGlobPattern",
+          "group": "inline",
+          "when": "view == ccLinkComputers && (viewItem == watching_glob_tree || viewItem == paused_glob_tree)"
+        },
+        {
+          "command": "ccLink.removeGlobPattern",
+          "group": "inline",
+          "when": "view == ccLinkComputers && (viewItem == globPattern || viewItem == globalGlobPattern)"
+        },
+        {
+          "command": "ccLink.resumeWatching",
+          "group": "inline",
+          "when": "view == ccLinkComputers && viewItem == paused_glob_tree"
+        },
+        {
+          "command": "ccLink.pauseWatching",
+          "group": "inline",
+          "when": "view == ccLinkComputers && viewItem == watching_glob_tree"
+        },
+        {
+          "command": "ccLink.createFile",
+          "group": "file_creation@1",
+          "when": "view == ccLinkComputers && (viewItem == remote_folder || viewItem == connected_remote_file_tree)"
+        },
+        {
+          "command": "ccLink.createFolder",
+          "group": "file_creation@2",
+          "when": "view == ccLinkComputers && (viewItem == remote_folder || viewItem == connected_remote_file_tree)"
+        },
+        {
+          "command": "ccLink.deleteFile",
+          "group": "file_operation@2",
+          "when": "view == ccLinkComputers && (viewItem == remote_folder || viewItem == remote_file)"
+        },
+        {
+          "command": "ccLink.downloadFile",
+          "group": "share",
+          "when": "view == ccLinkComputers && viewItem == remote_file"
+        },
+        {
+          "command": "ccLink.renameFile",
+          "group": "file_operation@1",
+          "when": "view == ccLinkComputers && viewItem == remote_file"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "ccLink.disconnectComputer",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.copyUUID",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.reboot",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.createComputerShell",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.addGlobPattern",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.removeGlobPattern",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.resumeWatching",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.pauseWatching",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.createFile",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.createFolder",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.deleteFile",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.downloadFile",
+          "when": "false"
+        },
+        {
+          "command": "ccLink.renameFile",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "ComputerCraft Link",
+        "properties": {
+          "ccLink.websocket.port": {
+            "type": "integer",
+            "default": 56560,
+            "maximum": 65535,
+            "minimum": 1,
+            "description": "The TCP port to use for making websocket connections."
+          },
+          "ccLink.installScript.host": {
+            "type": "string",
+            "default": "127.0.0.1",
+            "examples": [
+              "127.0.0.1",
+              "127.0.0.1:56560"
+            ],
+            "markdownDescription": "The [host](https://developer.mozilla.org/en-US/docs/Web/API/URL/host) that the client script should try connecting to. If no port is given, the port from `ccLink.websocket.port` will be used."
+          },
+          "ccLink.workspace.root": {
+            "type": "string",
+            "default": "./",
+            "examples": [
+              "src/",
+              "scripts/"
+            ],
+            "pattern": ".*/$",
+            "markdownDescription": "Defines the root of the workspace for file watching and processing. For example, if set to `src/`, only files inside `src/` will match your glob patterns. When files are sent to the client, the `src/` prefix is removed, transforming `workspaceFolder/src/main.lua` into `workspaceFolder/main.lua`. When used with `ccLink.computer.root`, paths can be fully transformed for the client."
+          },
+          "ccLink.workspace.globalGlobs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "examples": [
+              "src/**/*.lua",
+              "!.vscode"
+            ],
+            "markdownDescription": "Glob patterns to use for all computers."
+          },
+          "ccLink.computer.root": {
+            "type": "string",
+            "markdownDescription": "Defines the target root directory on the client where files will be sent. Defaults to the name of the current workspace. For example, if set to `myProject/libs/text/`, a file at `workspaceFolder/src/main.lua` will be placed at `myProject/libs/text/src/main.lua` on the client. When used with `ccLink.workspace.root`, paths can be fully transformed for the client."
+          },
+          "ccLink.computer.timeout": {
+            "type": "number",
+            "default": 5,
+            "description": "Number of seconds before a message will timeout while waiting for a response from the client."
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "package": "tsc --noEmit && node esbuild.config.js --production",
+    "watch": "node esbuild.config.js --watch",
+    "build": "vsce package --no-dependencies",
+    "lint": "eslint src --ext ts",
+    "style": "prettier --check .",
+    "style:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.7",
+    "@types/triple-beam": "^1.3.5",
+    "@types/uuid": "^9.0.8",
+    "@types/vscode": "^1.96.0",
+    "@types/ws": "^8.5.13",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.24.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
+    "husky": "^8.0.3",
+    "mocha": "^10.8.2",
+    "prettier": "^2.8.8",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.3",
+    "triple-beam": "^1.4.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.17.0",
+    "winston-transport": "^4.9.0",
+    "ws": "^8.18.0",
+    "zod": "^3.24.1"
+  }
+}

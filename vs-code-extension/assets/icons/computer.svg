@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><svg
+  id="c"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 400 400"
+>
+  <g id="d">
+    <path
+      id="e"
+      d="M400,0V400H0V0H400ZM25,375H375V25H25V375Z"
+      style="fill:rgb(255, 255, 255)"
+    />
+    <polygon
+      id="f"
+      points="350 50 50 50 50 175 25 175 25 25 375 25 375 250 350 250 350 50"
+      style="fill:rgb(255, 255, 255)"
+    />
+    <polygon
+      id="g"
+      points="350 300 350 250 375 250 375 375 25 375 25 175 50 175 50 300 350 300"
+      style="fill:rgb(255, 255, 255)"
+    />
+    <rect id="h" x="300" y="325" width="50" height="25" style="fill: #272727" />
+  </g>
+  <g id="i"><rect id="j" x="50" y="50" width="300" height="250" /></g>
+</svg>
