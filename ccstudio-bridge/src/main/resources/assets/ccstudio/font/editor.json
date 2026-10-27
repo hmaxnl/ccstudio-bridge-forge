@@ -1,7 +1,11 @@
 {
-  "type": "ttf",
-  "file": "ccstudio:cascadia_code.ttf",
-  "size": 9,
-  "oversample": 12,
-  "shift": [0, 0]
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "ccstudio:cascadia_code.ttf",
+      "size": 9.0,
+      "oversample": 12.0,
+      "shift": [0.0, 0.0]
+    }
+  ]
 }

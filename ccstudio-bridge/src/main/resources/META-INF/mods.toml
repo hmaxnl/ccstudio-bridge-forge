@@ -39,8 +39,10 @@ authors="${mod_authors}" #optional
 # MATCH_VERSION means that your mod will be displayed in the select screen if the server version of the mod matches
 # IGNORE_SERVER_VERSION means that your mod will be displayed in the select screen regardless of the server versions
 # NO_DISPLAY means that your mod will not be displayed in the server connection screen.
-# Specify MATCH_VERSION, if you have 'depends' declared for the mod
-displayTest="MATCH_VERSION" #match_this_version | ignore_server_version
+# This mod is optional on both sides (the channel accepts a remote side without it), so the
+# server's presence/version must be ignored - otherwise the server list marks servers that
+# do not run this mod as incompatible.
+displayTest="IGNORE_SERVER_VERSION" #match_this_version | ignore_server_version
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.${mod_id}]] #optional

@@ -59,15 +59,17 @@ public final class CideMod {
     public CideMod() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModContainer modContainer = FMLJavaModLoadingContext.get().getContainer();
-        // CC-Studio Bridge is a client-side editor. On a dedicated server it must load
-        // without registering any client functionality.
-        if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
-            LOGGER.info("[CC-Studio Bridge] Dedicated server environment detected. Client bridge disabled.");
-            return;
-        }
+        // The mod runs on both sides: the CIDE services below are server-side, the editor UI
+        // and the ccLink bridge are client-side. The network channel and the server handlers
+        // MUST also register on a dedicated server - skipping them there left the channel
+        // unregistered server-side, so the client's channel handshake rejected every join with
+        // "the server is missing the following mods". Only the client config and the client
+        // bridge lifecycle hook are guarded by dist below.
 
         modContainer.addConfig(new ModConfig(ModConfig.Type.SERVER, CideServerConfig.SPEC, modContainer));
-        modContainer.addConfig(new ModConfig(ModConfig.Type.CLIENT, CideClientConfig.SPEC, modContainer));
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            modContainer.addConfig(new ModConfig(ModConfig.Type.CLIENT, CideClientConfig.SPEC, modContainer));
+        }
 
         CidePackets.register();
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent e) -> CideLuaCatalog.prewarm());
@@ -92,6 +94,7 @@ public final class CideMod {
             if (family == ComputerFamily.NORMAL && !CideServerConfig.BASIC_EDITOR.get()) return;
 
             if (!(e.getEntity() instanceof ServerPlayer player)) return;
+            if (!CidePackets.hasChannel(player)) return; // client without the mod: keep the vanilla computer GUI
 
             CideAccess.Target target = CideAccess.resolve(player, computer);
             if (!target.allowed()) {
@@ -129,6 +132,7 @@ public final class CideMod {
             ItemStack stack = e.getItemStack();
             if (!(stack.getItem() instanceof PocketComputerItem pocketItem)) return;
             if (!(e.getEntity() instanceof ServerPlayer player)) return;
+            if (!CidePackets.hasChannel(player)) return; // client without the mod: keep vanilla behaviour
 
             
             if (pocketItem.getFamily() == ComputerFamily.NORMAL && !CideServerConfig.BASIC_EDITOR.get()) return;
@@ -179,6 +183,7 @@ public final class CideMod {
                     .requires(source -> source.hasPermission(2))
                     .executes(ctx -> {
                         ServerPlayer player = ctx.getSource().getPlayerOrException();
+                        if (!CidePackets.hasChannel(player)) return 0; // client without the mod cannot open the IDE
                         if (!CideServerConfig.ENABLED.get()) {
                             CidePackets.sendDenied(player, "CIDE is disabled");
                             return 0;
@@ -221,12 +226,15 @@ public final class CideMod {
         // [general] auto_start_server is enabled) and disconnects on logout and
         // client shutdown. It no longer connects on world join - an idle
         // connection without an open computer would just create a meaningless
-        // "CC-Studio Bridge" entry in the ccLink tree.
-        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
-            WebSocketBridge.stop();
-        });
-        // No client-stopped hook in this Forge build: the dialer thread is a
-        // daemon, so it dies with the JVM.
+        // "CC-Studio Bridge" entry in the ccLink tree. Client-only: the bridge never runs
+        // on a dedicated server, and the event class itself is a client class.
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) -> {
+                WebSocketBridge.stop();
+            });
+            // No client-stopped hook in this Forge build: the dialer thread is a
+            // daemon, so it dies with the JVM.
+        }
     }
 
     /** Human-readable computer type for IDE titles and the ccLink tree entry name. */

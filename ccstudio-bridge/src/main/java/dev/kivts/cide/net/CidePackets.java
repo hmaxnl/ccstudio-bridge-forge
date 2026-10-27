@@ -9,7 +9,9 @@ import dev.kivts.cide.server.CideSessionService;
 import dev.kivts.cide.server.CideStubService;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.ConnectionData;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -27,12 +29,16 @@ public final class CidePackets {
     private static final String PROTOCOL_VERSION = "14"; // v14: OpenIdePayload gains computerType
     public static final ResourceLocation CHANNEL_ID = new ResourceLocation("ccstudio", "cide");
 
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-        CHANNEL_ID,
-        () -> PROTOCOL_VERSION,
-        version -> PROTOCOL_VERSION.equals(version),
-        version -> PROTOCOL_VERSION.equals(version)
-    );
+    // acceptMissingOr(...) makes the channel optional on both sides: a client that has this
+    // mod can join a server without it (and vice versa) without the handshake rejecting the
+    // connection with "the server is missing the following mods". When both sides have the
+    // mod, the protocol version must still match exactly.
+    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
+        .named(CHANNEL_ID)
+        .networkProtocolVersion(() -> PROTOCOL_VERSION)
+        .clientAcceptedVersions(NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION))
+        .serverAcceptedVersions(NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION))
+        .simpleChannel();
 
     private static int nextId = 0;
 
@@ -121,7 +127,18 @@ public final class CidePackets {
         ctx.get().setPacketHandled(true);
     }
 
+    /**
+     * Whether the given player's client actually has this mod: true only when the client
+     * announced our channel during the login handshake. Use this before any server->client
+     * interaction so players on vanilla (or mod-less) clients are left on the stock behaviour.
+     */
+    public static boolean hasChannel(ServerPlayer player) {
+        ConnectionData data = NetworkHooks.getConnectionData(player.connection.connection);
+        return data != null && data.getChannels().containsKey(CHANNEL_ID);
+    }
+
     public static void sendToPlayer(ServerPlayer player, Object message) {
+        if (!hasChannel(player)) return; // client without the mod would only drop the packet anyway
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 
