@@ -259,7 +259,9 @@ public final class BridgePanel {
 
         int maxScroll = Math.max(0, lines.size() - visible);
         drawerScroll = Mth.clamp(drawerScroll, 0, maxScroll);
-        int start = Math.max(0, lines.size() - visible + drawerScroll);
+        // drawerScroll counts lines above the bottom edge, so scrolling up moves the window
+        // backwards through the list (was: + drawerScroll, which inverted the scroll direction)
+        int start = Math.max(0, lines.size() - visible - drawerScroll);
         for (int i = start; i < lines.size(); i++) {
             LogLine line = lines.get(i);
             int y = bodyY + (i - start) * LINE_H;
